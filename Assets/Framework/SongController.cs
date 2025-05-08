@@ -87,9 +87,9 @@ public class SongController : MonoBehaviour
         }
     }
 
-    public void PlayNote(Note note)
+    public bool PlayNote(Note note)
     {
-        if (!hasSongStarted) return;
+        if (!hasSongStarted || currentBarIndex >= _currentSong.Bars.Length) return false;
 
         var closestNote = GetClosest32thNote(currentBarStartTime, currentBarStartTime + currentBarDuration, currentTime);
         if (MathF.Abs(closestNote - currentTime) < _hitThreshold)
@@ -99,6 +99,7 @@ public class SongController : MonoBehaviour
             {
                 scoredBeats[key] = true;
                 Debug.Log($"Hit! Note: {note}, Time: {currentTime}, Diff: {MathF.Abs(closestNote - currentTime)}");
+                return true;
             }
             else
             {
@@ -106,6 +107,7 @@ public class SongController : MonoBehaviour
                 Debug.Log($"Hit wrong note! Note: {note}, Time: {currentTime}");
             }
         }
+        return false;
     }
 
     private float GetClosest32thNote(float start, float end, float target)

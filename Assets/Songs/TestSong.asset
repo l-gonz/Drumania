@@ -12,4 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b61eb959a88de6b409eabc36c80bcb1e, type: 3}
   m_Name: TestSong
   m_EditorClassIdentifier: 
-  DefaultTempo: 0
+  Bars:
+  - BeatsPerBar: 4
+    BeatLength: 0.25
+    Beats:
+    - Note: 0
+      Time: 0
+    - Note: 0
+      Time: 0.25
+    - Note: 0
+      Time: 0.5
+    - Note: 0
+      Time: 0.75
+  DefaultTempo: 60

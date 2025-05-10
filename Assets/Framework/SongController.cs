@@ -9,6 +9,9 @@ public class SongController : MonoBehaviour
     [SerializeField] private float _hitThreshold = .1f;
     [SerializeField] private SongData _currentSong;
 
+    public event Action<int> OnCountdownTrigger;
+    public event Action<float> OnBeatTrigger;
+
     public static SongController Instance { get; private set; }
     private void Awake()
     {
@@ -27,16 +30,19 @@ public class SongController : MonoBehaviour
     private float currentTime;
 
     private float currentBarStartTime;
-    private float currentBarDuration;
 
     private bool hasSongStarted;
+    private float lastTriggerTime;
+
+    private float beatDuration => 60f / currentTempo;
+    private float currentBarDuration => _currentSong.Bars[currentBarIndex].BeatsPerBar * beatDuration;
 
     private Dictionary<Beat, bool> scoredBeats = new Dictionary<Beat, bool>();
 
     private void Start()
     {
         currentTempo = _currentSong.DefaultTempo;
-        currentTime = - _countdown;
+        currentTime = - _countdown - 0.3f;
 
         var beatDuration = 60f / currentTempo;
         var accumulatedTime = 0f;
@@ -49,41 +55,63 @@ public class SongController : MonoBehaviour
             }
             accumulatedTime += barDuration;
         }
-
-        currentBarDuration = _currentSong.Bars[currentBarIndex].BeatsPerBar * (60f / currentTempo);
     }
 
     private void Update()
     {
-        if (currentBarIndex >= _currentSong.Bars.Length) return;
+        currentTime += Time.deltaTime;
 
-        if (MathF.Abs(currentTime - (int)currentTime) < 0.03f)
+        if (!hasSongStarted)
         {
-            Debug.Log($"Current time: {(int)currentTime}");
+            HandleCountdown();
+        }
+        
+        if (hasSongStarted && currentBarIndex < _currentSong.Bars.Length)
+        {
+            HandleBeat();
+        }
+    }
+
+    private void HandleCountdown()
+    {
+        var nextCount = Mathf.Round(currentTime) + 0.45f;
+        if (currentTime >= nextCount && lastTriggerTime != nextCount)
+        {
+            lastTriggerTime = nextCount;
+            Debug.Log($"Countdown {lastTriggerTime}: {currentTime}");
+            OnCountdownTrigger?.Invoke((int)lastTriggerTime);
         }
 
-        currentTime += Time.deltaTime;
-        if (!hasSongStarted && currentTime >= 0)
+        if (currentTime >= 0)
         {
             hasSongStarted = true;
+            lastTriggerTime = -beatDuration;
             Debug.Log("Song started!");
         }
+    }
 
-        if (hasSongStarted)
+    private void HandleBeat()
+    {
+        // End bar
+        if (currentTime >= currentBarStartTime + currentBarDuration)
         {
-            if (currentTime >= currentBarStartTime + currentBarDuration)
+            currentBarIndex++;
+            currentBarStartTime = currentTime;
+            if (currentBarIndex >= _currentSong.Bars.Length)
             {
-                currentBarIndex++;
-                currentBarStartTime = currentTime;
-                if (currentBarIndex >= _currentSong.Bars.Length)
-                {
-                    Debug.Log("Song ended!");
-                    Debug.Log($"Score: {scoredBeats.Count(x => x.Value)} / {scoredBeats.Count}");
-                    return;
-                }
-                currentBarDuration = _currentSong.Bars[currentBarIndex].BeatsPerBar * (60f / currentTempo);
-                Debug.Log($"Bar {currentBarIndex} started at {currentBarStartTime}");
+                Debug.Log("Song ended!");
+                Debug.Log($"Score: {scoredBeats.Count(x => x.Value)} / {scoredBeats.Count}");
+                return;
             }
+            Debug.Log($"Bar {currentBarIndex} started at {currentBarStartTime}");
+        }
+
+        var nextBeat = lastTriggerTime + beatDuration;
+        if (currentTime >= nextBeat)
+        {
+            lastTriggerTime = nextBeat;
+            Debug.Log($"Beat {(int)((currentTime - currentBarStartTime) / beatDuration)}: {currentTime}");
+            OnBeatTrigger?.Invoke(lastTriggerTime);
         }
     }
 

@@ -18,6 +18,12 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        SongController.Instance.OnBeatTrigger += _ => PlaySound("Metronome");
+        SongController.Instance.OnCountdownTrigger += _ => PlaySound("Countdown");
+    }
+
     public void PlaySound(string id)
     {
         if (_globalSource != null && _audioData.TryGetValue(id, out AudioClip clip))

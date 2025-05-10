@@ -23,31 +23,25 @@ public class UIManager : MonoBehaviour
     {
         _countdownText.gameObject.SetActive(false);
         _countdownText.text = string.Empty;
-        StartCountdown(4);
+        SongController.Instance.OnCountdownTrigger += SetCountdown;
     }
 
-    public void StartCountdown(int countdown)
-    {
-        StartCoroutine(CountdownRoutine(countdown));
-    }
-
-    private IEnumerator CountdownRoutine(int countdown)
+    private void SetCountdown(int countdown)
     {
         _countdownText.gameObject.SetActive(true);
-        for (int i = countdown - 1; i >= 0; i--)
+        if (countdown == 0)
         {
-            if (i == 0)
-            {
-                _countdownText.text = "GO!";
-            }
-            else
-            {
-                _countdownText.text = i.ToString();
-            }
-            AudioManager.Instance.PlaySound("Countdown");
-            yield return new WaitForSeconds(1f);
+            _countdownText.text = "GO!";
+            Invoke(nameof(HideCountdown), .5f);
         }
+        else
+        {
+            _countdownText.text = countdown.ToString();
+        }
+    }
 
+    private void HideCountdown()
+    {
         _countdownText.gameObject.SetActive(false);
     }
 }

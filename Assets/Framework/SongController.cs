@@ -35,9 +35,11 @@ public class SongController : MonoBehaviour
     private float lastTriggerTime;
 
     private float beatDuration => 60f / currentTempo;
-    private float currentBarDuration => _currentSong.Bars[currentBarIndex].BeatsPerBar * beatDuration;
+    private float currentBarDuration => song[currentBarIndex].BeatsPerBar * beatDuration;
+    private bool hasSongEnded => currentBarIndex >= song.Count;
 
     private Dictionary<Beat, bool> scoredBeats = new Dictionary<Beat, bool>();
+    private List<Bar> song;
 
     private void Start()
     {
@@ -55,6 +57,13 @@ public class SongController : MonoBehaviour
             }
             accumulatedTime += barDuration;
         }
+
+        // Add count in
+        song = _currentSong.Bars.Prepend(new Bar()
+        {
+            BeatsPerBar = 4,
+            BeatLength = .25f,
+        }).ToList();
     }
 
     private void Update()
@@ -66,7 +75,7 @@ public class SongController : MonoBehaviour
             HandleCountdown();
         }
         
-        if (hasSongStarted && currentBarIndex < _currentSong.Bars.Length)
+        if (hasSongStarted && !hasSongEnded)
         {
             HandleBeat();
         }
@@ -96,13 +105,13 @@ public class SongController : MonoBehaviour
         if (currentTime >= currentBarStartTime + currentBarDuration)
         {
             currentBarIndex++;
-            currentBarStartTime = currentTime;
-            if (currentBarIndex >= _currentSong.Bars.Length)
+            if (hasSongEnded)
             {
                 Debug.Log("Song ended!");
                 Debug.Log($"Score: {scoredBeats.Count(x => x.Value)} / {scoredBeats.Count}");
                 return;
             }
+            currentBarStartTime += currentBarDuration;
             Debug.Log($"Bar {currentBarIndex} started at {currentBarStartTime}");
         }
 
@@ -117,7 +126,7 @@ public class SongController : MonoBehaviour
 
     public bool PlayNote(Note note)
     {
-        if (!hasSongStarted || currentBarIndex >= _currentSong.Bars.Length) return false;
+        if (!hasSongStarted || hasSongEnded) return false;
 
         var closestNote = GetClosest32thNote(currentBarStartTime, currentBarStartTime + currentBarDuration, currentTime);
         if (MathF.Abs(closestNote - currentTime) < _hitThreshold)

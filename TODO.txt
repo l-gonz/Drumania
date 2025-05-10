@@ -1,6 +1,3 @@
-- Add metronome
-- Add count in
-
 - Allow easy bar repeat
 - Add basic timing visual feedback
 

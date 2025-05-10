@@ -1,9 +1,10 @@
-- Add basic visual feedback
-- Allow easy bar repeat
-- Add count in
 - Add metronome
+- Add count in
 
-- Add basic sound
+- Allow easy bar repeat
+- Add basic timing visual feedback
+
+- Add play end
 
 - Add multiple instruments
 - Implement input system (keyboard)

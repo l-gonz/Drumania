@@ -44,6 +44,7 @@ public class UIManager : MonoBehaviour
             {
                 _countdownText.text = i.ToString();
             }
+            AudioManager.Instance.PlaySound("Countdown");
             yield return new WaitForSeconds(1f);
         }
 

@@ -15,6 +15,7 @@ MonoBehaviour:
   Bars:
   - BeatsPerBar: 4
     BeatLength: 0.25
+    Repeat: 5
     Beats:
     - Note: 0
       Time: 0
@@ -24,4 +25,4 @@ MonoBehaviour:
       Time: 0.5
     - Note: 0
       Time: 0.75
-  DefaultTempo: 60
+  DefaultTempo: 100

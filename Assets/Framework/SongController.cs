@@ -63,7 +63,7 @@ public class SongController : MonoBehaviour
         {
             BeatsPerBar = 4,
             BeatLength = .25f,
-        }).ToList();
+        }).SelectMany(bar => Enumerable.Repeat(bar, bar.Repeat)).ToList();
     }
 
     private void Update()

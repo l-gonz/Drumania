@@ -1,7 +1,7 @@
-- Allow easy bar repeat
 - Add basic timing visual feedback
 
 - Add play end
+- Add audio strings
 
 - Add multiple instruments
 - Implement input system (keyboard)

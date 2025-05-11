@@ -13,6 +13,7 @@ public class Bar
 {
     public int BeatsPerBar = 4; // Number of beats in the bar
     public float BeatLength = 1/4f; // Length of each beat
+    public int Repeat = 1; // Number of times the bar is played
     public Beat[] Beats; // Array of beats in the bar
 }
 

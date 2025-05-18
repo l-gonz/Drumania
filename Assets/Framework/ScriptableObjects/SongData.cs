@@ -14,12 +14,12 @@ public class Bar
     public int BeatsPerBar = 4; // Number of beats in the bar
     public float BeatLength = 1/4f; // Length of each beat
     public int Repeat = 1; // Number of times the bar is played
-    public Beat[] Beats; // Array of beats in the bar
+    public Note[] Notes; // Array of beats in the bar
 }
 
 [Serializable]
-public record Beat
+public record Note
 {
-    public Note Note;
-    public float Time; // Position of the beat in the bar
+    public NoteType NoteType;
+    public float Time; // Position of the note in the bar
 }

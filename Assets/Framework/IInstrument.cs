@@ -1,5 +1,5 @@
 public interface IInstrument
 {
-    Note Note { get; } 
+    NoteType NoteType { get; } 
     void PlayNote();
 }

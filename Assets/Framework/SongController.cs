@@ -9,8 +9,10 @@ public class SongController : MonoBehaviour
     [SerializeField] private float _hitThreshold = .1f;
     [SerializeField] private SongData _currentSong;
 
+    public event Action<List<Bar>, int> OnSongStarted;
+    public event Action OnSongEnded;
     public event Action<int> OnCountdownTrigger;
-    public event Action<float> OnBeatTrigger;
+    public event Action<float, int> OnBeatTrigger;
 
     public static SongController Instance { get; private set; }
     private void Awake()
@@ -25,8 +27,11 @@ public class SongController : MonoBehaviour
         }
     }
 
+    public float CurrentTime => currentTime;
+
     private int currentTempo;
     private int currentBarIndex;
+    private int currentBeatIndex;
     private float currentTime;
 
     private float currentBarStartTime;
@@ -38,7 +43,7 @@ public class SongController : MonoBehaviour
     private float currentBarDuration => song[currentBarIndex].BeatsPerBar * beatDuration;
     private bool hasSongEnded => currentBarIndex >= song.Count;
 
-    private Dictionary<Beat, bool> scoredBeats = new Dictionary<Beat, bool>();
+    private Dictionary<Note, bool> scoredBeats = new Dictionary<Note, bool>();
     private List<Bar> song;
 
     private void Start()
@@ -46,24 +51,26 @@ public class SongController : MonoBehaviour
         currentTempo = _currentSong.DefaultTempo;
         currentTime = - _countdown - 0.3f;
 
+        // Add count in and repeat bars
+        song = _currentSong.Bars.Prepend(new Bar()
+        {
+            BeatsPerBar = 4,
+            BeatLength = .25f,
+            Notes = Array.Empty<Note>(),
+        }).SelectMany(bar => Enumerable.Repeat(bar, bar.Repeat)).ToList();
+
+        // Populate score dictionary
         var beatDuration = 60f / currentTempo;
         var accumulatedTime = 0f;
-        foreach (var bar in _currentSong.Bars)
+        foreach (var bar in song)
         {
-            var barDuration = bar.BeatsPerBar  * beatDuration;
-            foreach (var beat in bar.Beats)
+            var barDuration = bar.BeatsPerBar * beatDuration;
+            foreach (var beat in bar.Notes)
             {
                 scoredBeats.Add(beat with {Time = accumulatedTime + beat.Time * barDuration}, false);
             }
             accumulatedTime += barDuration;
         }
-
-        // Add count in
-        song = _currentSong.Bars.Prepend(new Bar()
-        {
-            BeatsPerBar = 4,
-            BeatLength = .25f,
-        }).SelectMany(bar => Enumerable.Repeat(bar, bar.Repeat)).ToList();
     }
 
     private void Update()
@@ -96,6 +103,7 @@ public class SongController : MonoBehaviour
             hasSongStarted = true;
             lastTriggerTime = -beatDuration;
             Debug.Log("Song started!");
+            OnSongStarted?.Invoke(song, currentTempo);
         }
     }
 
@@ -105,10 +113,12 @@ public class SongController : MonoBehaviour
         if (currentTime >= currentBarStartTime + currentBarDuration)
         {
             currentBarIndex++;
+            currentBeatIndex = 0;
             if (hasSongEnded)
             {
                 Debug.Log("Song ended!");
                 Debug.Log($"Score: {scoredBeats.Count(x => x.Value)} / {scoredBeats.Count}");
+                OnSongEnded?.Invoke();
                 return;
             }
             currentBarStartTime += currentBarDuration;
@@ -120,41 +130,38 @@ public class SongController : MonoBehaviour
         {
             lastTriggerTime = nextBeat;
             Debug.Log($"Beat {(int)((currentTime - currentBarStartTime) / beatDuration)}: {currentTime}");
-            OnBeatTrigger?.Invoke(lastTriggerTime);
+            OnBeatTrigger?.Invoke(lastTriggerTime, currentBeatIndex);
+            currentBeatIndex++;
         }
     }
 
-    public bool PlayNote(Note note)
+    public bool PlayNote(NoteType note)
     {
         if (!hasSongStarted || hasSongEnded) return false;
 
-        var closestNote = GetClosest32thNote(currentBarStartTime, currentBarStartTime + currentBarDuration, currentTime);
-        if (MathF.Abs(closestNote - currentTime) < _hitThreshold)
+        var closestNoteKey = scoredBeats.Keys.Aggregate((curMin, x) => 
+            MathF.Abs(x.Time - currentTime) < MathF.Abs(curMin.Time - currentTime) 
+            ? x : curMin);
+
+        if (MathF.Abs(closestNoteKey.Time - currentTime) < _hitThreshold)
         {
-            var key = new Beat(){Note = note, Time = closestNote};
-            if (scoredBeats.TryGetValue(key, out var scored) && !scored)
+            if (scoredBeats.TryGetValue(closestNoteKey, out var scored) && !scored)
             {
-                scoredBeats[key] = true;
-                Debug.Log($"Hit! Note: {note}, Time: {currentTime}, Diff: {MathF.Abs(closestNote - currentTime)}");
+                scoredBeats[closestNoteKey] = true;
+                Debug.Log($"Hit! Note: {note}, Time: {currentTime}, Diff: {MathF.Abs(closestNoteKey.Time - currentTime)}");
                 return true;
             }
             else
             {
-                scoredBeats[new Beat(){Note = note, Time = currentTime}] = false;
+                scoredBeats[new Note(){NoteType = note, Time = currentTime}] = false;
                 Debug.Log($"Hit wrong note! Note: {note}, Time: {currentTime}");
             }
         }
+        else
+        {
+            Debug.Log($"Missed! Note: {note}, Time: {currentTime}, Closest: {closestNoteKey.Time}");
+        }
+
         return false;
-    }
-
-    private float GetClosest32thNote(float start, float end, float target)
-    {
-        int subdivisions = 32;
-        float step = (end - start) / subdivisions;
-
-        return Enumerable.Range(0, subdivisions)
-                        .Select(i => new { Index = i, Point = start + i * step })
-                        .OrderBy(x => MathF.Abs(x.Point - target))
-                        .First().Point;
     }
 }

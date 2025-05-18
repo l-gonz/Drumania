@@ -20,7 +20,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        SongController.Instance.OnBeatTrigger += _ => PlaySound("Metronome");
+        SongController.Instance.OnBeatTrigger += (_,_) => PlaySound("Metronome");
         SongController.Instance.OnCountdownTrigger += _ => PlaySound("Countdown");
     }
 

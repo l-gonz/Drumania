@@ -7,7 +7,7 @@ public class AudioData : ScriptableObject
 {
     public AudioClipData[] AudioClips;
 
-    public bool TryGetValue(string id, out AudioClip clip)
+    public bool TryGetValue(AudioString id, out AudioClip clip)
     {
         try
         {
@@ -25,6 +25,6 @@ public class AudioData : ScriptableObject
 [Serializable]
 public class AudioClipData
 {
-    public string ID;
+    public AudioString ID;
     public AudioClip AudioClip;
 }

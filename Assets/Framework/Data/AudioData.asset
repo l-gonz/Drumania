@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: AudioData
   m_EditorClassIdentifier: 
   AudioClips:
-  - ID: Countdown
+  - ID: 1
     AudioClip: {fileID: 8300000, guid: c55011c5cf539ed45beeb2e467b8d2eb, type: 3}
-  - ID: Metronome
+  - ID: 0
     AudioClip: {fileID: 8300000, guid: 4489546c932fb7140b75677922115344, type: 3}
+  - ID: 2
+    AudioClip: {fileID: 8300000, guid: e5c473e2a6383544fbf232cf24998353, type: 3}
+  - ID: 3
+    AudioClip: {fileID: 8300000, guid: 2a4e1c9ffb71ed54a8551301262355b1, type: 3}

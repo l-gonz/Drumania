@@ -38,6 +38,8 @@ public class SnareDrum : MonoBehaviour, IInstrument
 
     public void PlayNote()
     {
+        AudioManager.Instance.PlaySound(AudioString.Snare);
+
         var isGoodHit = SongController.Instance.PlayNote(NoteType);
         _animator.SetTrigger(isGoodHit ? GOOD_HIT_TRIGGER : BAD_HIT_TRIGGER);
     }

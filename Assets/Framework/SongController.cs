@@ -117,7 +117,6 @@ public class SongController : MonoBehaviour
             if (hasSongEnded)
             {
                 Debug.Log("Song ended!");
-                Debug.Log($"Score: {scoredBeats.Count(x => x.Value)} / {scoredBeats.Count}");
                 OnSongEnded?.Invoke();
                 return;
             }
@@ -163,5 +162,10 @@ public class SongController : MonoBehaviour
         }
 
         return false;
+    }
+
+    public (int Score, int MaxScore) GetScore()
+    {
+        return (scoredBeats.Count(x => x.Value), scoredBeats.Count);
     }
 }

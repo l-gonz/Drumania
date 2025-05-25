@@ -1,11 +1,11 @@
-- Add basic timing visual feedback
 
-- Add play end
 - Add audio strings
 
 - Add multiple instruments
-- Implement input system (keyboard)
+- Drum kit 3D model
 
+- Implement input system (keyboard)
 - Implement input system (midi)
 
 - Tempo changes
+- Add main menu

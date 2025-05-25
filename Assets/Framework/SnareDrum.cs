@@ -11,6 +11,7 @@ public class SnareDrum : MonoBehaviour, IInstrument
 
     private const string GOOD_HIT_TRIGGER = "GoodHit";
     private const string BAD_HIT_TRIGGER = "BadHit";
+    private const string NOTE_TRIGGER = "Note";
 
     private List<Bar> song;
     private int currentTempo;
@@ -50,14 +51,13 @@ public class SnareDrum : MonoBehaviour, IInstrument
     private void OnBeat(float time, int beatIndex)
     {
         if (beatIndex == 0) nextBarIndex++;
+        else return;
+        
         if (nextBarIndex >= song.Count) return;
 
-        var nextBar = song[nextBarIndex];
-        var notesInNextBeat = nextBar.Notes.Where(b => b.NoteType == NoteType 
-                                                    && b.Time >= beatIndex * beatDuration 
-                                                    && b.Time < (beatIndex + 1) * beatDuration);
+        var notesInNextBar = song[nextBarIndex].Notes.Where(b => b.NoteType == NoteType);
 
-        foreach (var note in notesInNextBeat)
+        foreach (var note in notesInNextBar)
         {
             var timingArtifact = Instantiate(_timingPrefab, 
                 transform.position + Vector3.up * (_travelDistance + _endPositionY), 
@@ -65,6 +65,12 @@ public class SnareDrum : MonoBehaviour, IInstrument
             timingArtifact.SetSpeed(Vector3.down * _travelDistance / barDuration);
             timingArtifact.DelayedStart(note.Time * barDuration);
             timingArtifact.DelayedDestroy(barDuration * (1 + note.Time));
+            Invoke(nameof(TriggerNoteVisuals), barDuration * (1 + note.Time));
         }
+    }
+
+    private void TriggerNoteVisuals()
+    {
+        _animator.SetTrigger(NOTE_TRIGGER);
     }
 }

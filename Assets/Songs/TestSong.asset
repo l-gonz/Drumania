@@ -25,4 +25,4 @@ MonoBehaviour:
       Time: 0.5
     - NoteType: 0
       Time: 0.75
-  DefaultTempo: 60
+  DefaultTempo: 120

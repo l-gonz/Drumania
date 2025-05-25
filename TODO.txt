@@ -1,7 +1,5 @@
 
-- Add audio strings
 
-- Add multiple instruments
 - Drum kit 3D model
 
 - Implement input system (keyboard)

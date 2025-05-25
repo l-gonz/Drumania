@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b61eb959a88de6b409eabc36c80bcb1e, type: 3}
+  m_Name: MoneyBeatQuarters
+  m_EditorClassIdentifier: 
+  Bars:
+  - BeatsPerBar: 4
+    BeatLength: 0.25
+    Repeat: 5
+    Notes:
+    - NoteType: 1
+      Time: 0
+    - NoteType: 1
+      Time: 0.25
+    - NoteType: 0
+      Time: 0.25
+    - NoteType: 1
+      Time: 0.5
+    - NoteType: 1
+      Time: 0.75
+    - NoteType: 0
+      Time: 0.75
+  DefaultTempo: 80

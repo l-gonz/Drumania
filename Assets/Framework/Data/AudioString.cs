@@ -6,5 +6,5 @@ public enum AudioString
     Countdown,
     Drumsticks,
     Snare,
-
+    HiHat,
 }

@@ -138,9 +138,10 @@ public class SongController : MonoBehaviour
     {
         if (!hasSongStarted || hasSongEnded) return false;
 
-        var closestNoteKey = scoredBeats.Keys.Aggregate((curMin, x) => 
-            MathF.Abs(x.Time - currentTime) < MathF.Abs(curMin.Time - currentTime) 
-            ? x : curMin);
+        var closestNoteKey = scoredBeats.Keys
+            .Where(x => x.NoteType == note).Aggregate((curMin, x) => 
+                MathF.Abs(x.Time - currentTime) < MathF.Abs(curMin.Time - currentTime) 
+                ? x : curMin);
 
         if (MathF.Abs(closestNoteKey.Time - currentTime) < _hitThreshold)
         {
